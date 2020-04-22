@@ -2,11 +2,44 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
+import vuetify from "./plugins/vuetify";
+import MuseUI from "muse-ui";
+import "muse-ui/dist/muse-ui.css";
+import Antd from "ant-design-vue";
+import "ant-design-vue/dist/antd.css";
+Vue.use(Antd);
+Vue.use(MuseUI);
+
+import axios from "axios";
+Vue.prototype.$axios = axios;
 
 Vue.config.productionTip = false;
 
+// 导航钩子，全局钩子
+router.beforeEach((to, from, next) => {
+  let token = localStorage.getItem("token");
+  let isLogin;
+  if (!token) {
+    isLogin = false;
+  } else {
+    isLogin = true;
+  }
+  if (!isLogin) {
+    if (to.path !== "/login") {
+      return next({ path: "/login" });
+    } else {
+      next();
+    }
+  } else {
+    if (to.path === "/login") {
+      return next({ path: "/" });
+    }
+    next();
+  }
+});
 new Vue({
   router,
   store,
-  render: h => h(App)
+  vuetify,
+  render: (h) => h(App),
 }).$mount("#app");
